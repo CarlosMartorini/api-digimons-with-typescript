@@ -1,23 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import './App.css';
+import { useFavoriteDigimons } from './providers/favoriteDigimons/FavoriteDigimons';
+import { Digimon } from './types/Digimon';
+import { Container, FavoriteList, List } from './Styles';
+import DigimonsList from './components/digimonsList/DigimonsList';
 
 function App() {
+
+  const [digimons, setDigimons] = useState<Digimon[]>([] as Digimon[]);
+  const [error, setError] = useState<string>('');
+
+  const { favorites } = useFavoriteDigimons();
+
+  useEffect(() => {
+    axios('https://digimon-api.vercel.app/api/digimon')
+    .then((response) => setDigimons([...response.data]))
+    .catch((error) => setError(error));
+  }, [])
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h4>Welcome to Digimon World!</h4>
+        <Container>
+          <FavoriteList>
+            <DigimonsList digimons={favorites} isFavorite={true}/>
+          </FavoriteList>
+          <List>
+            <DigimonsList digimons={digimons}/>
+          </List>
+        </Container>
       </header>
     </div>
   );
